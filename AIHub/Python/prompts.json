@@ -1,0 +1,44 @@
+{
+  "clarify": {
+    "name": "Clarify",
+    "template": "Rewrite the following text for clarity and coherence without changing its meaning:\n\n{text}",
+    "enabled": true,
+    "description": "Makes text clearer and more coherent"
+  },
+  "friendly": {
+    "name": "Make Friendly",
+    "template": "Rewrite the following text to sound friendly and conversational:\n\n{text}",
+    "enabled": true,
+    "description": "Converts text to a friendly, conversational tone"
+  },
+  "summarize": {
+    "name": "Summarize",
+    "template": "Summarize the following text clearly in 3 sentences:\n\n{text}",
+    "enabled": true,
+    "description": "Creates a concise 3-sentence summary"
+  },
+  "professional": {
+    "name": "Professionalize",
+    "template": "Rewrite the following text to sound professional and polished:\n\n{text}",
+    "enabled": true,
+    "description": "Makes text sound professional and polished"
+  },
+  "expand": {
+    "name": "Expand",
+    "template": "Expand on the following text with more detail and depth:\n\n{text}",
+    "enabled": false,
+    "description": "Adds more detail and depth to the text"
+  },
+  "grammar": {
+    "name": "Fix Grammar",
+    "template": "Fix any grammar, spelling, and punctuation errors in the following text:\n\n{text}",
+    "enabled": true,
+    "description": "Corrects grammar, spelling, and punctuation"
+  },
+  "simplify": {
+    "name": "Simplify",
+    "template": "Rewrite the following text in simpler, easier-to-understand language:\n\n{text}",
+    "enabled": false,
+    "description": "Simplifies complex text"
+  }
+}

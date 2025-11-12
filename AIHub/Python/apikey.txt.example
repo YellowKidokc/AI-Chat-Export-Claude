@@ -1,0 +1,8 @@
+your-openai-api-key-here
+
+# Instructions:
+# 1. Rename this file to "apikey.txt"
+# 2. Replace the text above with your actual OpenAI API key
+# 3. Get your API key from: https://platform.openai.com/api-keys
+#
+# Note: apikey.txt is in .gitignore and will not be committed to version control
