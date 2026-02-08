@@ -48,3 +48,7 @@ AIHub/Python/config.json
 
 # Chat history (optional - uncomment to ignore)
 # chat_history.json
+
+# Conversation converter temp/output
+conversation_to_md/output/
+.pytest_cache/
