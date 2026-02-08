@@ -1,0 +1,10 @@
+{
+	"id": "ai-chat-export",
+	"name": "AI Chat Export",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Export and process AI chat conversations with configurable prompts and text transformation tools.",
+	"author": "AI Hub",
+	"authorUrl": "https://github.com/YellowKidokc/AI-Chat-Export-Claude",
+	"isDesktopOnly": false
+}

@@ -1,0 +1,187 @@
+/*
+ * AI Chat Export - Plugin Styles
+ *
+ * All styles are scoped to plugin-specific class prefixes (.ai-chat-export-*)
+ * to prevent conflicts with other plugins and Obsidian's own styles.
+ * Uses Obsidian CSS variables for theme compatibility (light and dark).
+ * Follows Obsidian's 4px spacing grid.
+ */
+
+/* ---------- Chat view wrapper ---------- */
+
+.ai-chat-export-chat-wrapper {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: var(--size-4-2);
+	gap: var(--size-4-2);
+}
+
+/* ---------- Chat header ---------- */
+
+.ai-chat-export-chat-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--size-4-2) 0;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ai-chat-export-chat-title {
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+}
+
+.ai-chat-export-header-actions {
+	display: flex;
+	gap: var(--size-4-2);
+}
+
+.ai-chat-export-header-btn {
+	background: var(--interactive-normal);
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	padding: var(--size-4-1) var(--size-4-3);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+	min-height: 44px;
+	min-width: 44px;
+}
+
+.ai-chat-export-header-btn:hover {
+	background: var(--interactive-hover);
+	color: var(--text-normal);
+}
+
+.ai-chat-export-header-btn:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Messages area ---------- */
+
+.ai-chat-export-messages {
+	flex: 1;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-3);
+	padding: var(--size-4-2) 0;
+}
+
+.ai-chat-export-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--text-faint);
+	font-size: var(--font-ui-medium);
+	font-style: italic;
+}
+
+/* ---------- Message bubbles ---------- */
+
+.ai-chat-export-message {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+	max-width: 85%;
+	padding: var(--size-4-3);
+	border-radius: var(--radius-m);
+}
+
+.ai-chat-export-message-user {
+	align-self: flex-end;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.ai-chat-export-message-assistant {
+	align-self: flex-start;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+}
+
+.ai-chat-export-message-label {
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-semibold);
+	opacity: 0.8;
+}
+
+.ai-chat-export-message-content {
+	font-size: var(--font-ui-medium);
+	line-height: var(--line-height-normal);
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.ai-chat-export-message-time {
+	font-size: var(--font-ui-smaller);
+	opacity: 0.6;
+	text-align: right;
+}
+
+/* ---------- Input area ---------- */
+
+.ai-chat-export-input-area {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	border-top: 1px solid var(--background-modifier-border);
+	padding-top: var(--size-4-2);
+}
+
+.ai-chat-export-input {
+	width: 100%;
+	resize: vertical;
+	min-height: 60px;
+	padding: var(--size-4-2);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-medium);
+	font-family: var(--font-interface);
+}
+
+.ai-chat-export-input:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: -2px;
+	border-color: var(--interactive-accent);
+}
+
+.ai-chat-export-input::placeholder {
+	color: var(--text-faint);
+}
+
+.ai-chat-export-send-btn {
+	align-self: flex-end;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
+	border-radius: var(--radius-s);
+	padding: var(--size-4-2) var(--size-4-4);
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+	min-height: 44px;
+	min-width: 44px;
+}
+
+.ai-chat-export-send-btn:hover {
+	opacity: 0.9;
+}
+
+.ai-chat-export-send-btn:focus-visible {
+	outline: 2px solid var(--text-normal);
+	outline-offset: 2px;
+}
+
+.ai-chat-export-input-hint {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	text-align: right;
+}
+
