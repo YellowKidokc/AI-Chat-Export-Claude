@@ -1,0 +1,56 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"env": {
+		"node": true
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"obsidianmd"
+	],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:obsidianmd/recommended"
+	],
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"rules": {
+		"no-unused-vars": "off",
+		"@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
+		"@typescript-eslint/ban-ts-comment": "off",
+		"no-prototype-builtins": "off",
+		"@typescript-eslint/no-empty-function": "off",
+
+		"obsidianmd/vault-read-only-for-display": "warn",
+		"obsidianmd/no-innerHTML": "error",
+		"obsidianmd/no-regex-lookbehind": "error",
+		"obsidianmd/use-normalize-path": "warn",
+		"obsidianmd/no-hardcoded-config-path": "warn",
+		"obsidianmd/use-platform-api": "warn",
+		"obsidianmd/no-navigator-platform": "warn",
+		"obsidianmd/register-event": "warn",
+		"obsidianmd/no-view-reference-storage": "warn",
+		"obsidianmd/no-command-in-command-name": "warn",
+		"obsidianmd/no-plugin-id-in-command-id": "warn",
+		"obsidianmd/no-default-hotkeys": "warn",
+		"obsidianmd/sentence-case": "warn",
+		"obsidianmd/use-set-heading": "warn",
+		"obsidianmd/no-inline-styles": "warn",
+		"obsidianmd/use-css-variables": "warn",
+		"obsidianmd/scope-css-selectors": "warn",
+		"obsidianmd/no-console-in-lifecycle": "warn",
+		"obsidianmd/use-request-url": "warn",
+		"obsidianmd/use-editor-api": "warn",
+		"obsidianmd/use-vault-process": "warn",
+		"obsidianmd/use-process-frontmatter": "warn",
+		"obsidianmd/no-vault-iterate": "warn",
+		"obsidianmd/use-obsidian-dom-helpers": "warn",
+		"obsidianmd/remove-sample-code": "warn",
+		"obsidianmd/keyboard-accessible": "warn",
+		"obsidianmd/aria-labels": "warn",
+		"obsidianmd/focus-visible": "warn"
+	}
+}
