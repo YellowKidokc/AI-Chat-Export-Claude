@@ -5,13 +5,15 @@ Handles Claude conversation exports which typically contain JSON with:
   - A list of conversation objects
   - Each conversation has: uuid, name, created_at, updated_at, chat_messages
   - Each chat_message has: uuid, text, sender ("human"/"assistant"), created_at, attachments
+
+Supports streaming for large files (50-200+ MB) via ijson.
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from conversation_to_md.core.models import Attachment, Conversation, Message
 from conversation_to_md.utils.normalize import (
@@ -19,16 +21,28 @@ from conversation_to_md.utils.normalize import (
     iso_to_datetime,
     sanitize_id,
 )
+from conversation_to_md.utils.streaming import iter_json_array
 
 
-def parse(extracted_dir: Path) -> List[Conversation]:
+def parse(
+    extracted_dir: Path,
+    progress_callback: Optional[Callable[[str], None]] = None,
+) -> List[Conversation]:
     """Parse Claude export files into canonical conversations."""
     json_files = _find_claude_json_files(extracted_dir)
     conversations: List[Conversation] = []
+    log = progress_callback or (lambda _: None)
 
     for json_file in json_files:
-        convos = _parse_file(json_file)
-        conversations.extend(convos)
+        log(f"Parsing {json_file.name}...")
+        count = 0
+        for raw_conv in iter_json_array(json_file, progress_callback):
+            conv = _parse_conversation(raw_conv)
+            if conv is not None:
+                conversations.append(conv)
+            count += 1
+            if count % 50 == 0:
+                log(f"Parsed {count} Claude conversations...")
 
     return conversations
 
@@ -60,23 +74,6 @@ def _is_claude_json(filepath: Path) -> bool:
     return False
 
 
-def _parse_file(filepath: Path) -> List[Conversation]:
-    """Parse a single Claude JSON file."""
-    with open(filepath, "r", encoding="utf-8") as fh:
-        data = json.load(fh)
-
-    if not isinstance(data, list):
-        data = [data]
-
-    conversations = []
-    for raw_conv in data:
-        conv = _parse_conversation(raw_conv)
-        if conv is not None:
-            conversations.append(conv)
-
-    return conversations
-
-
 def _parse_conversation(raw: dict) -> Optional[Conversation]:
     """Convert a single Claude conversation dict into the canonical model."""
     if not isinstance(raw, dict):
@@ -93,8 +90,19 @@ def _parse_conversation(raw: dict) -> Optional[Conversation]:
         if msg is not None:
             messages.append(msg)
 
+    # Extract model info
+    model = raw.get("model") or ""
+
+    # Try to extract model from message metadata if not at conversation level
+    if not model:
+        for raw_msg in raw_messages:
+            if isinstance(raw_msg, dict):
+                msg_model = raw_msg.get("model") or ""
+                if msg_model:
+                    model = msg_model
+                    break
+
     metadata = {}
-    model = raw.get("model")
     if model:
         metadata["model"] = model
     project = raw.get("project")
@@ -106,6 +114,7 @@ def _parse_conversation(raw: dict) -> Optional[Conversation]:
         source="claude",
         title=title,
         created_at=created_at,
+        model=model,
         messages=messages,
         metadata=metadata,
     )
@@ -139,7 +148,7 @@ def _parse_message(raw_msg: dict) -> Optional[Message]:
                     elif block.get("type") == "tool_use":
                         parts.append(f"[Tool call: {block.get('name', 'unknown')}]")
                     elif block.get("type") == "tool_result":
-                        parts.append(f"[Tool result]")
+                        parts.append("[Tool result]")
                 elif isinstance(block, str):
                     parts.append(block)
             text = "\n".join(parts).strip()
@@ -150,6 +159,7 @@ def _parse_message(raw_msg: dict) -> Optional[Message]:
         return None
 
     created_at = iso_to_datetime(raw_msg.get("created_at"))
+    model = raw_msg.get("model") or None
 
     attachments = _extract_attachments(raw_msg)
 
@@ -157,6 +167,7 @@ def _parse_message(raw_msg: dict) -> Optional[Message]:
         role=role,
         content=text,
         created_at=created_at,
+        model=model,
         attachments=attachments,
     )
 

@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from conversation_to_md.core.models import Attachment, Conversation, Message
 from conversation_to_md.utils.normalize import (
@@ -29,7 +29,10 @@ from conversation_to_md.utils.normalize import (
 )
 
 
-def parse(extracted_dir: Path) -> List[Conversation]:
+def parse(
+    extracted_dir: Path,
+    progress_callback: Optional[Callable[[str], None]] = None,
+) -> List[Conversation]:
     """Parse Gemini export files into canonical conversations."""
     conversations: List[Conversation] = []
 

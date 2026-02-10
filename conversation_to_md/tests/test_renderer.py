@@ -12,6 +12,7 @@ def _make_conversation(**kwargs):
         source="chatgpt",
         title="Test Conversation",
         created_at=datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc),
+        model="gpt-4o",
         messages=[
             Message(
                 role="user",
@@ -35,11 +36,30 @@ def test_basic_render():
     md = render_conversation(conv, options)
 
     assert "---" in md
-    assert "source: chatgpt" in md
+    assert "platform: ChatGPT" in md
     assert "conversation_id: test-1" in md
-    assert "# Test Conversation" in md
+    assert "Test Conversation" in md
     assert "What is 2+2?" in md
     assert "2+2 equals 4." in md
+
+
+def test_yaml_frontmatter():
+    conv = _make_conversation()
+    md = render_conversation(conv, RenderOptions())
+    # Check for YAML frontmatter keys
+    assert 'title: "Test Conversation"' in md
+    assert "date: 2025-06-15" in md
+    assert "model: gpt-4o" in md
+    assert "platform: ChatGPT" in md
+    assert "messages: 2" in md
+
+
+def test_metadata_block():
+    conv = _make_conversation()
+    md = render_conversation(conv, RenderOptions())
+    assert "**Model:** gpt-4o" in md
+    assert "**Title:** Test Conversation" in md
+    assert "**Length:** 2 messages" in md
 
 
 def test_emoji_headers():
@@ -51,20 +71,21 @@ def test_emoji_headers():
 
     md_without = render_conversation(conv, RenderOptions(emoji_headers=False))
     assert "\U0001f9d1" not in md_without
-    assert "## User" in md_without
-    assert "## Assistant" in md_without
+    assert "**User**" in md_without
+    assert "**Assistant**" in md_without
 
 
 def test_no_timestamps():
     conv = _make_conversation()
     md = render_conversation(conv, RenderOptions(include_timestamps=False))
-    # Frontmatter still has created_at, but per-message italic timestamps
-    # like *2025-06-15 12:00:00* should be absent from the message body.
-    lines_with_inline_ts = [
-        line for line in md.splitlines()
-        if line.startswith("*2025-06-15")
-    ]
-    assert len(lines_with_inline_ts) == 0
+    # With timestamps off, no "(2025-06-15 12:00)" should appear in headers
+    assert "(2025-06-15" not in md
+
+
+def test_timestamps_included():
+    conv = _make_conversation()
+    md = render_conversation(conv, RenderOptions(include_timestamps=True))
+    assert "(2025-06-15 12:00)" in md
 
 
 def test_system_messages_excluded_by_default():
@@ -105,3 +126,38 @@ def test_attachments():
     md = render_conversation(conv, RenderOptions())
     assert "Attachments:" in md
     assert "photo.png" in md
+
+
+def test_truncation():
+    long_content = "A" * 10000
+    conv = _make_conversation(
+        messages=[Message(role="user", content=long_content)]
+    )
+    md = render_conversation(conv, RenderOptions(truncate_length=100))
+    assert "truncated" in md
+    assert "10,000 characters" in md
+    # Verify content is actually truncated
+    assert "A" * 100 in md
+    assert "A" * 10000 not in md
+
+
+def test_no_truncation_when_zero():
+    long_content = "B" * 5000
+    conv = _make_conversation(
+        messages=[Message(role="user", content=long_content)]
+    )
+    md = render_conversation(conv, RenderOptions(truncate_length=0))
+    assert "truncated" not in md
+    assert "B" * 5000 in md
+
+
+def test_h1_title_with_date():
+    conv = _make_conversation()
+    md = render_conversation(conv, RenderOptions())
+    assert "# 2025-06-15 \u2014 Test Conversation" in md
+
+
+def test_first_user_message_in_metadata():
+    conv = _make_conversation()
+    md = render_conversation(conv, RenderOptions())
+    assert "**First message:** What is 2+2?" in md

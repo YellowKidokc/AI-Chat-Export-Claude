@@ -29,6 +29,7 @@ class Message:
     role: str  # "user" | "assistant" | "system" | "tool"
     content: str
     created_at: Optional[datetime] = None
+    model: Optional[str] = None
     attachments: List[Attachment] = field(default_factory=list)
 
 
@@ -45,5 +46,30 @@ class Conversation:
     source: str  # "chatgpt" | "claude" | "gemini" | "grok" | "unknown"
     title: str
     created_at: Optional[datetime] = None
+    model: Optional[str] = None
     messages: List[Message] = field(default_factory=list)
     metadata: dict = field(default_factory=dict)
+
+    @property
+    def message_count(self) -> int:
+        return len(self.messages)
+
+    @property
+    def platform_display(self) -> str:
+        """Human-friendly platform name."""
+        names = {
+            "chatgpt": "ChatGPT",
+            "claude": "Claude",
+            "gemini": "Gemini",
+            "grok": "Grok",
+            "unknown": "Unknown",
+        }
+        return names.get(self.source, self.source.title())
+
+    @property
+    def first_user_message(self) -> Optional[str]:
+        """Return the first user message content, if any."""
+        for msg in self.messages:
+            if msg.role == "user" and msg.content:
+                return msg.content[:200]
+        return None
