@@ -24,6 +24,7 @@ def _chatgpt_sample():
             "id": "conv-001",
             "title": "Math Help",
             "create_time": 1700000000.0,
+            "default_model_slug": "gpt-4o",
             "mapping": {
                 "root": {
                     "id": "root",
@@ -39,6 +40,7 @@ def _chatgpt_sample():
                         "author": {"role": "user"},
                         "content": {"content_type": "text", "parts": ["What is 2+2?"]},
                         "create_time": 1700000001.0,
+                        "metadata": {},
                     },
                 },
                 "msg-2": {
@@ -49,6 +51,7 @@ def _chatgpt_sample():
                         "author": {"role": "assistant"},
                         "content": {"content_type": "text", "parts": ["4"]},
                         "create_time": 1700000002.0,
+                        "metadata": {"model_slug": "gpt-4o"},
                     },
                 },
             },
@@ -73,11 +76,13 @@ def test_chatgpt_parse():
         conv = convos[0]
         assert conv.source == "chatgpt"
         assert conv.title == "Math Help"
+        assert conv.model == "gpt-4o"
         assert len(conv.messages) == 2
         assert conv.messages[0].role == "user"
         assert conv.messages[0].content == "What is 2+2?"
         assert conv.messages[1].role == "assistant"
         assert conv.messages[1].content == "4"
+        assert conv.messages[1].model == "gpt-4o"
 
 
 # ---- Claude ----
@@ -88,6 +93,7 @@ def _claude_sample():
             "uuid": "conv-c-001",
             "name": "Python Question",
             "created_at": "2025-01-15T10:00:00Z",
+            "model": "claude-3-opus",
             "chat_messages": [
                 {
                     "uuid": "msg-c-1",
@@ -123,6 +129,7 @@ def test_claude_parse():
         conv = convos[0]
         assert conv.source == "claude"
         assert conv.title == "Python Question"
+        assert conv.model == "claude-3-opus"
         assert len(conv.messages) == 2
         assert conv.messages[0].role == "user"
         assert conv.messages[1].role == "assistant"
@@ -244,7 +251,7 @@ def test_full_pipeline_chatgpt():
         assert written[0].exists()
 
         content = written[0].read_text(encoding="utf-8")
-        assert "source: chatgpt" in content
+        assert "platform: ChatGPT" in content
         assert "What is 2+2?" in content
         assert "4" in content
 
@@ -267,5 +274,35 @@ def test_full_pipeline_claude():
         assert len(written) == 1
 
         content = written[0].read_text(encoding="utf-8")
-        assert "source: claude" in content
+        assert "platform: Claude" in content
         assert "Python Question" in content
+
+
+def test_vault_pipeline():
+    """End-to-end vault build with CSV and Excel."""
+    from conversation_to_md.core.pipeline import convert_zip_to_vault
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+
+        zip_path = tmp_path / "export.zip"
+        with zipfile.ZipFile(zip_path, "w") as zf:
+            zf.writestr("conversations.json", json.dumps(_chatgpt_sample()))
+
+        output_dir = tmp_path / "vault"
+        result = convert_zip_to_vault(
+            zip_path, output_dir,
+            include_csv=True,
+            include_excel=True,
+        )
+
+        assert result["source"] == "chatgpt"
+        assert len(result["md_files"]) == 1
+        assert result["csv_path"] is not None
+        assert result["csv_path"].exists()
+        assert result["excel_path"] is not None
+        assert result["excel_path"].exists()
+
+        stats = result["stats"]
+        assert stats["total_conversations"] == 1
+        assert stats["total_messages"] == 2
